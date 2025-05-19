@@ -1,0 +1,15 @@
+{
+  "name": "crickettournament-service",
+  "version": "1.0.0",
+  "description": "CAP service for Cricket Tournament",
+  "scripts": {
+    "start": "cds run",
+    "watch": "cds watch"
+  },
+  "dependencies": {
+    "@sap/cds": "^8"
+  },
+  "devDependencies": {
+    "@sap/cds-dk": "^8.9.4"
+  }
+}

@@ -1,0 +1,146 @@
+_schema-version: 3.3.0
+ID: crickettournament
+description: A simple CAP project.
+version: 1.0.0
+modules:
+- name: crickettournament-srv
+  type: nodejs
+  path: gen/srv
+  requires:
+  - name: crickettournament-auth
+  - name: crickettournament-destination
+  - name: crickettournament-logging
+  provides:
+  - name: srv-api
+    properties:
+      srv-url: ${default-url}
+  parameters:
+    buildpack: nodejs_buildpack
+    instances: 1
+  build-parameters:
+    builder: npm-ci
+- name: crickettournament
+  type: approuter.nodejs
+  path: app/router
+  requires:
+  - name: srv-api
+    group: destinations
+    properties:
+      forwardAuthToken: true
+      name: srv-api
+      url: ~{srv-url}
+  - name: crickettournament-auth
+  - name: crickettournament-destination
+  - name: crickettournament-html5-runtime
+  - name: crickettournament-logging
+  provides:
+  - name: app-api
+    properties:
+      app-protocol: ${protocol}
+      app-uri: ${default-uri}
+  parameters:
+    disk-quota: 256M
+    keep-existing-routes: true
+    memory: 256M
+- name: crickettournament-app-deployer
+  type: com.sap.application.content
+  path: gen
+  requires:
+  - name: crickettournament-html5-repo-host
+    parameters:
+      content-target: true
+  build-parameters:
+    build-result: app/
+    requires:
+    - artifacts:
+      - admin-books.zip
+      name: crickettournamentadminbooks
+      target-path: app/
+    - artifacts:
+      - browse.zip
+      name: crickettournamentbrowse
+      target-path: app/
+    - artifacts:
+      - crickettournamentteamsui.zip
+      name: crickettournamentteamsui
+      target-path: app/
+- name: crickettournamentadminbooks
+  type: html5
+  path: app/admin-books
+  build-parameters:
+    build-result: dist
+    builder: custom
+    commands:
+    - npm ci
+    - npm run build
+    supported-platforms: []
+- name: crickettournamentbrowse
+  type: html5
+  path: app/browse
+  build-parameters:
+    build-result: dist
+    builder: custom
+    commands:
+    - npm ci
+    - npm run build
+    supported-platforms: []
+- name: crickettournamentteamsui
+  type: html5
+  path: app/teams-ui
+  build-parameters:
+    build-result: dist
+    builder: custom
+    commands:
+    - npm install
+    - npm run build:cf
+    supported-platforms: []
+resources:
+- name: crickettournament-auth
+  type: org.cloudfoundry.managed-service
+  parameters:
+    config:
+      tenant-mode: dedicated
+      xsappname: crickettournament-${org}-${space}
+    path: ./xs-security.json
+    service: xsuaa
+    service-plan: application
+- name: crickettournament-destination
+  type: org.cloudfoundry.managed-service
+  parameters:
+    config:
+      HTML5Runtime_enabled: false
+      init_data:
+        instance:
+          destinations:
+          - Authentication: NoAuthentication
+            Name: ui5
+            ProxyType: Internet
+            Type: HTTP
+            URL: https://ui5.sap.com
+          existing_destinations_policy: update
+    service: destination
+    service-plan: lite
+- name: crickettournament-html5-repo-host
+  type: org.cloudfoundry.managed-service
+  parameters:
+    service: html5-apps-repo
+    service-plan: app-host
+- name: crickettournament-html5-runtime
+  type: org.cloudfoundry.managed-service
+  parameters:
+    service: html5-apps-repo
+    service-plan: app-runtime
+- name: crickettournament-logging
+  type: org.cloudfoundry.managed-service
+  parameters:
+    service: application-logs
+    service-plan: standard
+parameters:
+  deploy_mode: html5-repo
+  enable-parallel-deployments: true
+build-parameters:
+  before-all:
+  - builder: custom
+    commands:
+    - npm ci
+    - npx cds build --production

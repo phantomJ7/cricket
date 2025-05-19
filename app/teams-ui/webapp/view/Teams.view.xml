@@ -1,0 +1,43 @@
+<mvc:View
+  controllerName="teamsui.controller.Teams"
+  xmlns:mvc="sap.ui.core.mvc"
+  xmlns="sap.m">
+
+  <Page id="teamsPage" title="Teams">
+    <content>
+      <Table id="teamsTable" items="{path: '/Teams'}" growing="true" growingThreshold="10">
+        <headerToolbar>
+          <Toolbar id="teamsTableToolbar">
+            <Title id="teamsTableTitle" text="Teams List" />
+          </Toolbar>
+        </headerToolbar>
+        <columns>
+          <Column id="teamIdColumn">
+            <header>
+              <Text id="teamIdHeader" text="Team ID"/>
+            </header>
+          </Column>
+          <Column id="teamNameColumn">
+            <header>
+              <Text id="teamNameHeader" text="Team Name"/>
+            </header>
+          </Column>
+          <Column id="captainColumn">
+            <header>
+              <Text id="captainHeader" text="Captain"/>
+            </header>
+          </Column>
+        </columns>
+        <items>
+          <ColumnListItem id="teamItem">
+            <cells>
+              <Text id="teamIdText" text="{Team_ID}" />
+              <Text id="teamNameText" text="{TeamName}" />
+              <Text id="captainText" text="{Captain}" />
+            </cells>
+          </ColumnListItem>
+        </items>
+      </Table>
+    </content>
+  </Page>
+</mvc:View>

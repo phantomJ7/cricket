@@ -1,0 +1,24 @@
+<mvc:View
+  xmlns:mvc="sap.ui.core.mvc"
+  xmlns="sap.m"
+  controllerName="demo.walkthrough.controller.App">
+
+  <App>
+    <Page title="Walkthrough Steps 1-9">
+
+      <content>
+        <!-- Step 7: Data Binding -->
+        <Text text="{/recipient/name}" />
+
+        <!-- Step 8: Two-Way Binding -->
+        <Input value="{/recipient/name}" />
+
+        <!-- Step 9: i18n Button -->
+        <Button
+          text="{i18n>helloBtn}"
+          press=".onShowHello" />
+      </content>
+
+    </Page>
+  </App>
+</mvc:View>
